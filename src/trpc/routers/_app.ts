@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { baseProcedure, createTRPCRouter } from '../init';
-import { TRPCError } from '@trpc/server';
+import { baseProcedure, createTRPCRouter, protectedProcedure } from '../init';
+import { db } from '@/db';
 
 export const appRouter = createTRPCRouter({
-    hello: baseProcedure
+    hello: protectedProcedure
         .input(
             z.object({
                 text: z.string(),
@@ -11,6 +11,7 @@ export const appRouter = createTRPCRouter({
         )
         .query((opts) => {
             // database and load the video 
+            console.log({ dbUser: opts.ctx.user });
             return {
                 greeting: `hello ${opts.input.text}`,
             };
