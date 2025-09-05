@@ -7,6 +7,9 @@ import { createTRPCReact } from '@trpc/react-query';
 import { useState } from 'react';
 import { makeQueryClient } from './query-client';
 import type { AppRouter } from './routers/_app';
+import superjson from 'superjson';
+import { headers } from 'next/headers';
+
 export const trpc = createTRPCReact<AppRouter>();
 let clientQueryClientSingleton: QueryClient;
 function getQueryClient() {
@@ -40,8 +43,13 @@ export function TRPCProvider(
         trpc.createClient({
             links: [
                 httpBatchLink({
-                    // transformer: superjson, <-- if you use a data transformer
+                    transformer: superjson,
                     url: getUrl(),
+                    async headers() {
+                        const headers = new Headers();
+                        headers.set('x-trpc-source', 'next-react');
+                        return headers;
+                    }
                 }),
             ],
         }),
